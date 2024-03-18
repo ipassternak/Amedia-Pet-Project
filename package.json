@@ -29,7 +29,10 @@
     "typeorm:run-migrations": "npm run typeorm migration:run -- -d dist/db/migrations.config.js",
     "typeorm:revert-migration": "npm run typeorm -- -d dist/db/migrations.config.js migration:revert",
     "typeorm:generate-migration": "npm run build && npm run typeorm -- -d dist/db/migrations.config.js migration:generate src/db/migrations/$npm_config_name",
-    "typeorm:create-migration": "npm run build && npm run typeorm -- migration:create src/db/migrations/$npm_config_name"
+    "typeorm:create-migration": "npm run build && npm run typeorm -- migration:create src/db/migrations/$npm_config_name",
+    "typeorm-extension": "ts-node ./node_modules/typeorm-extension/bin/cli.cjs",
+    "typeorm-extension:create-seed": "npm run build && npm run typeorm-extension -- seed:create --name src/db/seeds/$npm_config_name",
+    "typeorm-extension:run-seeds": "npm run typeorm-extension -- seed:run -d dist/db/migrations.config.js"
   },
   "dependencies": {
     "@golevelup/profiguration": "^0.2.1",
@@ -47,6 +50,7 @@
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "dotenv": "^16.4.5",
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "nestjs-command": "^3.1.3",
@@ -91,6 +95,7 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.1.0",
+    "typeorm-extension": "^3.5.0",
     "typescript": "^4.7.4",
     "webpack": "^5.90.3"
   },
