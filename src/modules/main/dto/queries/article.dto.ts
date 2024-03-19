@@ -1,9 +1,9 @@
-import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator'
+import { IsDateString, IsOptional, IsString } from 'class-validator'
 
 export class ArticleQueryDto {
   @IsOptional()
-  @IsUUID()
-  categoryId?: string
+  @IsString()
+  category?: string
 
   @IsOptional()
   @IsString()

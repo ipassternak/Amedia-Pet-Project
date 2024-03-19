@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { And, FindOptionsWhere, LessThan, Like, MoreThan, Repository } from 'typeorm'
+import { And, FindOptionsWhere, ILike, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm'
 
 import { ArticleToItemById, ArticleToListItem } from 'src/modules/main/interfaces/article'
 
@@ -18,23 +18,31 @@ export class ArticleService {
   ) {}
 
   async getList(query: ArticleQueryDto): Promise<{ data: ArticleToListItem[] }> {
-    const { categoryId, searchTerm, publishedBefore, publishedAfter } = query
+    const { category, searchTerm, publishedBefore, publishedAfter } = query
 
     const where: FindOptionsWhere<ArticleEntity> = {
       published: true,
-      categoryId,
-      content: searchTerm && {
-        title: Like(`%${searchTerm}%`),
-        description: Like(`%${searchTerm}%`),
+      category: category && {
+        names: {
+          name: ILike(`%${category}%`),
+        },
       },
+      content: searchTerm && [
+        {
+          title: ILike(`%${searchTerm}%`),
+        },
+        {
+          description: ILike(`%${searchTerm}%`),
+        },
+      ],
     }
 
     if (publishedBefore && publishedAfter) {
-      where.publishedAt = And(LessThan(new Date(publishedAfter)), MoreThan(new Date(publishedBefore)))
+      where.publishedAt = And(LessThanOrEqual(new Date(publishedAfter)), MoreThanOrEqual(new Date(publishedBefore)))
     } else if (publishedBefore) {
-      where.publishedAt = LessThan(new Date(publishedBefore))
+      where.publishedAt = LessThanOrEqual(new Date(publishedBefore))
     } else if (publishedAfter) {
-      where.publishedAt = MoreThan(new Date(publishedAfter))
+      where.publishedAt = MoreThanOrEqual(new Date(publishedAfter))
     }
 
     const articleList = await this.articleRepository.find({
