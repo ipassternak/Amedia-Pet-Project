@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common'
 import { ScheduleModule } from '@nestjs/schedule'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
+import { CategoryNameEntity } from './entities/category-name.entity'
+import { CategoryEntity } from './entities/category.entity'
+
 import { ArticleContentEntity } from 'src/modules/main/entities/article-content.entity'
 import { ArticleEntity } from 'src/modules/main/entities/article.entity'
 import { ProjectEntity } from 'src/modules/main/entities/project.entity'
@@ -17,7 +20,10 @@ import { ArticleDataMapper } from 'src/modules/main/data-mappers/article.data-ma
 import { ProjectDataMapper } from 'src/modules/main/data-mappers/project.data-mapper'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProjectEntity, ArticleEntity, ArticleContentEntity]), ScheduleModule.forRoot()],
+  imports: [
+    TypeOrmModule.forFeature([ProjectEntity, ArticleEntity, ArticleContentEntity, CategoryEntity, CategoryNameEntity]),
+    ScheduleModule.forRoot(),
+  ],
   controllers: [AppController, ProjectController, ArticleController],
   providers: [ProjectService, ProjectDataMapper, ArticleService, ArticleDataMapper],
 })

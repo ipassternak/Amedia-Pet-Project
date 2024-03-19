@@ -2,6 +2,7 @@ import { DataSource, DeepPartial } from 'typeorm'
 import { Seeder } from 'typeorm-extension'
 
 import { ArticleEntity } from 'src/modules/main/entities/article.entity'
+import { CategoryEntity } from 'src/modules/main/entities/category.entity'
 
 const DAY = 24 * 60 * 60 * 1000
 
@@ -11,12 +12,15 @@ export class Article1710771710106 implements Seeder {
   async run(dataSource: DataSource): Promise<void> {
     const repository = dataSource.getRepository(ArticleEntity)
 
+    const [ecology, science, culture] = await dataSource.getRepository(CategoryEntity).find()
+
     const createdAt = new Date(Date.now() - 5 * DAY)
 
     const articlesPartial: DeepPartial<ArticleEntity>[] = [
       {
         published: true,
         publishedAt: new Date(Date.now() - 3 * DAY),
+        categoryId: ecology.id,
         createdAt,
         content: [
           {
@@ -34,6 +38,7 @@ export class Article1710771710106 implements Seeder {
       {
         published: false,
         publishedAt: null,
+        categoryId: ecology.id,
         createdAt,
         content: [
           {
@@ -68,6 +73,7 @@ export class Article1710771710106 implements Seeder {
       {
         published: false,
         publishedAt: null,
+        categoryId: science.id,
         createdAt,
         content: [
           {
@@ -80,6 +86,7 @@ export class Article1710771710106 implements Seeder {
       {
         published: true,
         publishedAt: new Date(Date.now() - 1 * DAY),
+        categoryId: culture.id,
         createdAt,
         content: [
           {
@@ -90,6 +97,8 @@ export class Article1710771710106 implements Seeder {
         ],
       },
     ]
+
+    await repository.delete({})
 
     for (const articlePartial of articlesPartial) {
       const article = repository.create(articlePartial)

@@ -1,7 +1,9 @@
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common'
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 
 import { ArticleToItemById, ArticleToListItem } from 'src/modules/main/interfaces/article'
+
+import { ArticleQueryDto } from 'src/modules/main/dto/queries/article.dto'
 
 import { ArticleService } from 'src/modules/main/services/article.service'
 
@@ -11,8 +13,8 @@ export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Get('list')
-  async getList(): Promise<{ data: ArticleToListItem[] }> {
-    return await this.articleService.getList()
+  async getList(@Query() query: ArticleQueryDto): Promise<{ data: ArticleToListItem[] }> {
+    return await this.articleService.getList(query)
   }
 
   @Get('item/:id')
