@@ -17,7 +17,7 @@ async function bootstrap(): Promise<void> {
 
   app.use(bodyParser.json({ limit: '50mb' }))
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe({ transform: true }))
 
   app.enableCors({
     origin: process.env.CORS_ORIGINS.split(','),

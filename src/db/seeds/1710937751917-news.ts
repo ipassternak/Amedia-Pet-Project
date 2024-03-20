@@ -1,8 +1,8 @@
 import { DataSource, DeepPartial } from 'typeorm'
 import { Seeder } from 'typeorm-extension'
 
-import { ArticleEntity } from 'src/modules/main/entities/article.entity'
-import { CategoryEntity } from 'src/modules/main/entities/category.entity'
+import { NewsCategoryEntity } from 'src/modules/main/entities/news-category.entity'
+import { NewsEntity } from 'src/modules/main/entities/news.entity'
 
 const DAY = 24 * 60 * 60 * 1000
 
@@ -10,35 +10,50 @@ export class Article1710771710106 implements Seeder {
   track = false
 
   async run(dataSource: DataSource): Promise<void> {
-    const repository = dataSource.getRepository(ArticleEntity)
+    const repository = dataSource.getRepository(NewsEntity)
 
-    const [ecology, science, culture] = await dataSource.getRepository(CategoryEntity).find()
+    const [ecology, culture] = await dataSource.getRepository(NewsCategoryEntity).find({
+      where: {
+        content: [
+          {
+            title: 'Ecology',
+          },
+          {
+            title: 'Culture',
+          },
+        ],
+      },
+      order: {
+        createdAt: 'ASC',
+      },
+    })
 
     const createdAt = new Date(Date.now() - 5 * DAY)
 
-    const articlesPartial: DeepPartial<ArticleEntity>[] = [
+    const articlesPartial: DeepPartial<NewsEntity>[] = [
       {
+        slug: 'climate-change',
         published: true,
         publishedAt: new Date(Date.now() - 3 * DAY),
-        categoryId: ecology.id,
+        newsCategoryId: ecology.id,
         createdAt,
         content: [
           {
             title: 'Climate change',
             description: 'The climate is changing',
             language: 'en',
+            thumbnailUrl: 'https://i.imgur.com/Jvh1OQm.jpeg',
           },
           {
-            title: 'Cambio climático',
-            description: 'El clima está cambiando',
-            language: 'es',
+            title: 'Зміни клімату',
+            description: 'Клімат змінюється',
+            language: 'uk',
           },
         ],
       },
       {
-        published: false,
-        publishedAt: null,
-        categoryId: ecology.id,
+        slug: 'recycling',
+        newsCategoryId: ecology.id,
         createdAt,
         content: [
           {
@@ -54,6 +69,7 @@ export class Article1710771710106 implements Seeder {
         ],
       },
       {
+        slug: 'television-stars',
         published: true,
         publishedAt: new Date(Date.now() - 2 * DAY),
         createdAt,
@@ -62,6 +78,7 @@ export class Article1710771710106 implements Seeder {
             title: 'Зірки телебачення',
             description: 'Відомі люди телебачення',
             language: 'uk',
+            thumbnailUrl: 'https://i.imgur.com/Jvh1OQm.jpeg',
           },
           {
             title: 'Television stars',
@@ -71,9 +88,7 @@ export class Article1710771710106 implements Seeder {
         ],
       },
       {
-        published: false,
-        publishedAt: null,
-        categoryId: science.id,
+        slug: 'space-ships',
         createdAt,
         content: [
           {
@@ -84,15 +99,22 @@ export class Article1710771710106 implements Seeder {
         ],
       },
       {
+        slug: 'customs-and-traditions',
         published: true,
         publishedAt: new Date(Date.now() - 1 * DAY),
-        categoryId: culture.id,
+        newsCategoryId: culture.id,
         createdAt,
         content: [
           {
             title: 'Customs and traditions',
             description: 'Customs and traditions of different countries',
             language: 'en',
+          },
+          {
+            title: 'Традиції та звичаї',
+            description: 'Традиції та звичаї різних країн',
+            language: 'uk',
+            thumbnailUrl: 'https://i.imgur.com/Jvh1OQm.jpeg',
           },
         ],
       },

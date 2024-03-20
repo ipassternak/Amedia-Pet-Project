@@ -2,29 +2,33 @@ import { Module } from '@nestjs/common'
 import { ScheduleModule } from '@nestjs/schedule'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { CategoryNameEntity } from './entities/category-name.entity'
-import { CategoryEntity } from './entities/category.entity'
+import { NewsCategoryController } from './controllers/news-category.controller'
+import { NewsCategoryService } from './services/news-category.service'
 
-import { ArticleContentEntity } from 'src/modules/main/entities/article-content.entity'
-import { ArticleEntity } from 'src/modules/main/entities/article.entity'
+import { NewsCategoryContentEntity } from 'src/modules/main/entities/news-category-content.entity'
+import { NewsCategoryEntity } from 'src/modules/main/entities/news-category.entity'
+import { NewsContentEntity } from 'src/modules/main/entities/news-content.entity'
+import { NewsEntity } from 'src/modules/main/entities/news.entity'
 import { ProjectEntity } from 'src/modules/main/entities/project.entity'
 
-import { AppController } from 'src/modules/main/controllers/app.controller'
-import { ArticleController } from 'src/modules/main/controllers/article.controller'
-import { ProjectController } from 'src/modules/main/controllers/project.controller'
+import { NewsController } from 'src/modules/main/controllers/news.controller'
 
-import { ArticleService } from 'src/modules/main/services/article.service'
-import { ProjectService } from 'src/modules/main/services/project.service'
+import { NewsService } from 'src/modules/main/services/news.service'
 
-import { ArticleDataMapper } from 'src/modules/main/data-mappers/article.data-mapper'
-import { ProjectDataMapper } from 'src/modules/main/data-mappers/project.data-mapper'
+import { NewsCategoryDataMapper } from 'src/modules/main/data-mappers/news-category.data-mappers'
+import { NewsDataMapper } from 'src/modules/main/data-mappers/news.data-mapper'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ProjectEntity, ArticleEntity, ArticleContentEntity, CategoryEntity, CategoryNameEntity]),
-    ScheduleModule.forRoot(),
+    TypeOrmModule.forFeature([
+      ProjectEntity,
+      NewsEntity,
+      NewsContentEntity,
+      NewsCategoryEntity,
+      NewsCategoryContentEntity,
+    ]),
   ],
-  controllers: [AppController, ProjectController, ArticleController],
-  providers: [ProjectService, ProjectDataMapper, ArticleService, ArticleDataMapper],
+  controllers: [NewsController, NewsCategoryController],
+  providers: [NewsCategoryDataMapper, NewsDataMapper, NewsService, NewsCategoryService],
 })
 export class MainModule {}

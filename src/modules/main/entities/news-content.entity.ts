@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm'
 
-import { ArticleEntity } from 'src/modules/main/entities/article.entity'
+import { NewsEntity } from 'src/modules/main/entities/news.entity'
 
 @Entity('article_content')
-@Unique(['articleId', 'language'])
-export class ArticleContentEntity {
+@Unique(['newsId', 'language'])
+export class NewsContentEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
@@ -14,10 +14,13 @@ export class ArticleContentEntity {
   @Column({ length: 2000 })
   description: string
 
+  @Column({ length: 255, name: 'thumbnail_url' })
+  thumbnailUrl: string
+
   @Column({ length: 5 })
   language: string
 
-  @ManyToOne(() => ArticleEntity, (article) => article.content, { onDelete: 'CASCADE' })
+  @ManyToOne(() => NewsEntity, (news) => news.content, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'article_id' })
-  articleId: ArticleEntity
+  newsId: NewsEntity
 }
