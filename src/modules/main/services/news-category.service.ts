@@ -1,8 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { FindOptionsOrder, Repository } from 'typeorm'
+import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm'
 
-import { NewsCategoryToItemById, NewsCategoryToListItem } from 'src/modules/main/interfaces/news-category'
+import {
+  NewsCategorySortedFields,
+  NewsCategoryToItemById,
+  NewsCategoryToListItem,
+} from 'src/modules/main/interfaces/news-category'
 
 import { NewsCategoryQueryDto } from 'src/modules/main/dto/queries/news-category.dto'
 
@@ -35,19 +39,21 @@ export class NewsCategoryService {
   async getList(query: NewsCategoryQueryDto): Promise<{ meta: { total: number }; data: NewsCategoryToListItem[] }> {
     const { sortColumn, sortDirection, page, pageSize } = query
 
+    const where: FindOptionsWhere<NewsCategoryEntity> = {
+      published: true,
+      content: true,
+    }
+
     const order: FindOptionsOrder<NewsCategoryEntity> = {}
 
-    if (sortColumn === 'title') {
+    if (sortColumn === NewsCategorySortedFields.TITLE) {
       order.content = { title: sortDirection }
     } else if (sortColumn) {
       order[sortColumn] = sortDirection
     }
 
     const newsCategoryList = await this.newsCategoryRepository.find({
-      where: {
-        published: true,
-        content: true,
-      },
+      where,
       relations: {
         content: true,
       },
@@ -57,9 +63,7 @@ export class NewsCategoryService {
     })
 
     return {
-      meta: {
-        total: newsCategoryList.length,
-      },
+      meta: { total: await this.newsCategoryRepository.count({ where }) },
       data: newsCategoryList.map((newsCategory) =>
         this.newsCategoryDataMapper.newsCategoryToSearchResult(newsCategory),
       ),

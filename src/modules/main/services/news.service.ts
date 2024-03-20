@@ -11,7 +11,7 @@ import {
   Repository,
 } from 'typeorm'
 
-import { NewsToItemById, NewsToListItem } from 'src/modules/main/interfaces/news'
+import { NewsSortedFields, NewsToItemById, NewsToListItem } from 'src/modules/main/interfaces/news'
 
 import { NewsQueryDto } from 'src/modules/main/dto/queries/news.dto'
 
@@ -54,14 +54,12 @@ export class NewsService {
           },
         },
       ],
-      content: [
+      content: searchTerm && [
         {
-          title: searchTerm && ILike(`%${searchTerm}%`),
-          language: lang,
+          title: ILike(`%${searchTerm}%`),
         },
         {
-          description: searchTerm && ILike(`%${searchTerm}%`),
-          language: lang,
+          description: ILike(`%${searchTerm}%`),
         },
       ],
     }
@@ -76,15 +74,15 @@ export class NewsService {
 
     const order: FindOptionsOrder<NewsEntity> = {}
 
-    if (sortColumn === 'title') {
+    if (sortColumn === NewsSortedFields.TITLE) {
       order.content = { title: sortDirection }
-    } else if (sortColumn === 'newsCategory') {
+    } else if (sortColumn === NewsSortedFields.NEWS_CATEGORY) {
       order.newsCategory = { content: { title: sortDirection } }
     } else if (sortColumn) {
       order[sortColumn] = sortDirection
     }
 
-    const newsList = await this.newsRepository.find({
+    const list = await this.newsRepository.find({
       where,
       relations: {
         content: true,
@@ -97,8 +95,12 @@ export class NewsService {
       take: pageSize,
     })
 
+    const newsList = list.filter((news) => news.content.some((content) => content.language === lang))
+
+    newsList.forEach(({ content }) => content.sort((item) => (item.language === lang ? -1 : 1)))
+
     return {
-      meta: { total: newsList.length },
+      meta: { total: await this.newsRepository.count({ where }) },
       data: newsList.map((news) => this.newsDataMapper.newsToSearchResult(news)),
     }
   }
