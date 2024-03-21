@@ -1,16 +1,17 @@
 import { Type } from 'class-transformer'
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString, ValidateNested } from 'class-validator'
+import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString, MaxLength, ValidateNested } from 'class-validator'
 
-import { TranslationListDto } from 'src/modules/main/dto/requests/translation-list.dto'
+import { TranslationDto } from 'src/modules/main/dto/requests/translations.dto'
 
 export class NewsCreateDto {
   @IsString()
+  @MaxLength(100)
   @IsNotEmpty()
   slug: string
 
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => TranslationListDto)
-  translationList: TranslationListDto[]
+  @Type(() => TranslationDto)
+  translationList: TranslationDto[]
 }

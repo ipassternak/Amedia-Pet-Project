@@ -1,7 +1,7 @@
 import { Transform, Type } from 'class-transformer'
 import { IsArray, IsBoolean, IsDate, IsNotEmpty, IsUUID, ValidateNested } from 'class-validator'
 
-import { NewsCategoryTranslationListDto } from 'src/modules/main/dto/requests/news-category-translation-list.dto'
+import { NewsCategoryTranslationDto } from 'src/modules/main/dto/requests/translations.dto'
 
 export class NewsCategoryUpdateDto {
   @IsUUID()
@@ -10,8 +10,8 @@ export class NewsCategoryUpdateDto {
   @IsArray()
   @IsNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => NewsCategoryTranslationListDto)
-  translationList: NewsCategoryTranslationListDto[]
+  @Type(() => NewsCategoryTranslationDto)
+  translationList: NewsCategoryTranslationDto[]
 
   @IsDate()
   @Transform(({ value }) => new Date(value))

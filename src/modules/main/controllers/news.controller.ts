@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 
 import { NewsToItemById, NewsToListItem } from 'src/modules/main/interfaces/news'
@@ -38,8 +38,9 @@ export class NewsController {
   }
 
   @Delete('item/:id')
-  @HttpCode(204)
-  async deleteItemById(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string): Promise<void> {
+  async deleteItemById(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string): Promise<object> {
     await this.newsService.deleteItemById(id)
+
+    return {}
   }
 }

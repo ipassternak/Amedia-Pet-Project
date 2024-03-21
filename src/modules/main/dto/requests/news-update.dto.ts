@@ -9,22 +9,24 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  MaxLength,
   ValidateNested,
 } from 'class-validator'
 
 import { NewsCategoryUpdateDto } from 'src/modules/main/dto/requests/news-category-update.dto'
-import { TranslationListWithMetadataDto } from 'src/modules/main/dto/requests/translation-list-with-metadata.dto'
+import { NewsTranslationWithMetadataDto } from 'src/modules/main/dto/requests/translations.dto'
 
 export class NewsUpdateDto {
   @IsString()
+  @MaxLength(100)
   @IsNotEmpty()
   slug: string
 
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => TranslationListWithMetadataDto)
-  translationList: TranslationListWithMetadataDto[]
+  @Type(() => NewsTranslationWithMetadataDto)
+  translationList: NewsTranslationWithMetadataDto[]
 
   @IsOptional()
   @IsObject()
@@ -45,10 +47,12 @@ export class NewsUpdateDto {
   isPublished: boolean
 
   @IsString()
+  @MaxLength(100)
   @IsNotEmpty()
   title: string
 
   @IsString()
+  @MaxLength(2000)
   @IsNotEmpty()
   description: string
 }
