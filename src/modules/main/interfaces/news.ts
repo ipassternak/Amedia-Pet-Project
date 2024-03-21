@@ -1,4 +1,4 @@
-import { NewsCategoryToListItem } from 'src/modules/main/interfaces/news-category'
+import { NewsCategoryToItemById, NewsCategoryToListItem } from 'src/modules/main/interfaces/news-category'
 
 export enum NewsSortedFields {
   ID = 'id',
@@ -14,6 +14,8 @@ export interface NewsContentToTranslation {
   title: string
   description: string
   thumbnailUrl: string
+  contentData: { htmlText: string }
+  metaData: Record<string, string>
 }
 
 export interface NewsToListItem {
@@ -30,7 +32,7 @@ export interface NewsToItemById {
   id: string
   slug: string
   translationList: NewsContentToTranslation[]
-  newsCategory: NewsCategoryToListItem | null
+  newsCategory: NewsCategoryToItemById
   publishedAt: Date
   createdAt: Date
   isPublished: boolean

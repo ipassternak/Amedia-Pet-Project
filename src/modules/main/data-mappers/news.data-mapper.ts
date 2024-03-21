@@ -7,18 +7,22 @@ import { NewsEntity } from 'src/modules/main/entities/news.entity'
 
 import { NewsCategoryDataMapper } from 'src/modules/main/data-mappers/news-category.data-mappers'
 
+interface Options {
+  language: string
+}
+
 @Injectable()
 export class NewsDataMapper {
-  constructor(private readonly newCategoryDataMapper: NewsCategoryDataMapper) {}
+  constructor(private readonly newsCategoryDataMapper: NewsCategoryDataMapper) {}
 
-  private newsContentToTitle(content: NewsContentEntity[]): string {
-    const [{ title }] = content
+  private newsContentToTitle(content: NewsContentEntity[], opts?: Options): string {
+    const contentItem = (opts && content.find((c) => c.language === opts.language)) ?? content[0]
 
-    return title
+    return contentItem?.title ?? ''
   }
 
   private newsContentToTranslation(content: NewsContentEntity): NewsContentToTranslation {
-    const { id, language, title, description, thumbnailUrl } = content
+    const { id, language, title, description, thumbnailUrl, content: htmlText, metadata } = content
 
     return {
       translationId: id,
@@ -26,17 +30,19 @@ export class NewsDataMapper {
       title,
       description,
       thumbnailUrl,
+      contentData: { htmlText },
+      metaData: metadata,
     }
   }
 
-  newsToSearchResult(entity: NewsEntity): NewsToListItem {
+  newsToSearchResult(entity: NewsEntity, opts?: Options): NewsToListItem {
     const { id, createdAt, publishedAt, content, newsCategory, published, slug } = entity
 
     return {
       id,
       slug,
-      title: this.newsContentToTitle(content),
-      newsCategory: newsCategory ? this.newCategoryDataMapper.newsCategoryToSearchResult(newsCategory) : null,
+      title: this.newsContentToTitle(content, opts),
+      newsCategory: newsCategory ? this.newsCategoryDataMapper.newsCategoryToSearchResult(newsCategory, opts) : null,
       publishedAt,
       createdAt,
       isPublished: published,
@@ -50,7 +56,7 @@ export class NewsDataMapper {
       id,
       slug,
       translationList: content.map(this.newsContentToTranslation),
-      newsCategory: newsCategory ? this.newCategoryDataMapper.newsCategoryToSearchResult(newsCategory) : null,
+      newsCategory: newsCategory && this.newsCategoryDataMapper.newsCategoryGetById(newsCategory),
       publishedAt,
       createdAt,
       isPublished: published,

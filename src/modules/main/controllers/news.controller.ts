@@ -1,9 +1,11 @@
-import { Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 
 import { NewsToItemById, NewsToListItem } from 'src/modules/main/interfaces/news'
 
 import { NewsQueryDto } from 'src/modules/main/dto/queries/news.dto'
+import { NewsCreateDto } from 'src/modules/main/dto/requests/news-create.dto'
+import { NewsUpdateDto } from 'src/modules/main/dto/requests/news-update.dto'
 
 import { NewsService } from 'src/modules/main/services/news.service'
 
@@ -20,6 +22,19 @@ export class NewsController {
   @Get('item/:id')
   async getItemById(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string): Promise<{ data: NewsToItemById }> {
     return await this.newsService.getItemById(id)
+  }
+
+  @Post('item')
+  async createItem(@Body() newsCreateDto: NewsCreateDto): Promise<{ data: NewsToItemById }> {
+    return await this.newsService.createItem(newsCreateDto)
+  }
+
+  @Put('item/:id')
+  async updateItemById(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() newsUpdateDto: NewsUpdateDto,
+  ): Promise<{ data: NewsToItemById }> {
+    return await this.newsService.updateItemById(id, newsUpdateDto)
   }
 
   @Delete('item/:id')

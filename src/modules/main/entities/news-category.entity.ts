@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, CreateDateColumn, DeepPartial, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 
 import { NewsCategoryContentEntity } from 'src/modules/main/entities/news-category-content.entity'
 import { NewsEntity } from 'src/modules/main/entities/news.entity'
@@ -24,4 +24,8 @@ export class NewsCategoryEntity {
     cascade: true,
   })
   content: NewsCategoryContentEntity[]
+
+  constructor(partial: DeepPartial<NewsCategoryEntity>) {
+    Object.assign(this, partial)
+  }
 }

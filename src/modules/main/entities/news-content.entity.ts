@@ -20,6 +20,12 @@ export class NewsContentEntity {
   @Column({ length: 5 })
   language: string
 
+  @Column({ type: 'text' })
+  content: string
+
+  @Column({ type: 'json', default: {} })
+  metadata: Record<string, string>
+
   @ManyToOne(() => NewsEntity, (news) => news.content, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'article_id' })
   newsId: NewsEntity

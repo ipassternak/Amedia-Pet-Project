@@ -1,19 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import {
-  And,
-  FindOptionsOrder,
-  FindOptionsWhere,
-  ILike,
-  IsNull,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-  Repository,
-} from 'typeorm'
+import { Repository } from 'typeorm'
 
 import { NewsSortedFields, NewsToItemById, NewsToListItem } from 'src/modules/main/interfaces/news'
 
 import { NewsQueryDto } from 'src/modules/main/dto/queries/news.dto'
+import { NewsCreateDto } from 'src/modules/main/dto/requests/news-create.dto'
+import { NewsUpdateDto } from 'src/modules/main/dto/requests/news-update.dto'
 
 import { NewsEntity } from 'src/modules/main/entities/news.entity'
 
@@ -39,69 +32,52 @@ export class NewsService {
       pageSize,
     } = query
 
-    const where: FindOptionsWhere<NewsEntity> = {
-      published: true,
-      newsCategory: [
-        {
-          content: {
-            title: newsCategory && ILike(`%${newsCategory}%`),
-            language: lang,
-          },
-        },
-        {
-          content: {
-            title: IsNull(),
-          },
-        },
-      ],
-      content: searchTerm && [
-        {
-          title: ILike(`%${searchTerm}%`),
-        },
-        {
-          description: ILike(`%${searchTerm}%`),
-        },
-      ],
+    const listQuery = this.newsRepository
+      .createQueryBuilder('news')
+      .leftJoinAndSelect('news.content', 'newsContent')
+      .leftJoinAndSelect('news.newsCategory', 'newsCategory')
+      .leftJoinAndSelect('newsCategory.content', 'newsCategoryContent')
+      .where((qb) => {
+        const sq = qb.subQuery().select('news.id').from('article', 'news').leftJoin('news.content', 'newsContent')
+
+        if (searchTerm) {
+          const term = { searchTerm: `%${searchTerm}%` }
+
+          sq.where('newsContent.title ILIKE :searchTerm', term)
+          sq.orWhere('newsContent.description ILIKE :searchTerm', term)
+        }
+
+        return 'news.id IN ' + sq.getQuery()
+      })
+      .andWhere('news.published = :published', { published: true })
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+
+    if (newsCategory) {
+      listQuery.andWhere('newsCategory.id = :newsCategory', { newsCategory })
     }
 
-    if (publishedBefore && publishedAfter) {
-      where.publishedAt = And(LessThanOrEqual(new Date(publishedBefore)), MoreThanOrEqual(new Date(publishedAfter)))
-    } else if (publishedBefore) {
-      where.publishedAt = LessThanOrEqual(new Date(publishedBefore))
-    } else if (publishedAfter) {
-      where.publishedAt = MoreThanOrEqual(new Date(publishedAfter))
+    if (publishedBefore) {
+      listQuery.andWhere('news.publishedAt <= :publishedBefore', { publishedBefore })
     }
 
-    const order: FindOptionsOrder<NewsEntity> = {}
+    if (publishedAfter) {
+      listQuery.andWhere('news.publishedAt >= :publishedAfter', { publishedAfter })
+    }
 
     if (sortColumn === NewsSortedFields.TITLE) {
-      order.content = { title: sortDirection }
+      listQuery.orderBy('newsContent.title', sortDirection)
     } else if (sortColumn === NewsSortedFields.NEWS_CATEGORY) {
-      order.newsCategory = { content: { title: sortDirection } }
+      listQuery.orderBy('newsCategoryContent.title', sortDirection)
     } else if (sortColumn) {
-      order[sortColumn] = sortDirection
+      listQuery.orderBy(sortColumn, sortDirection)
     }
 
-    const list = await this.newsRepository.find({
-      where,
-      relations: {
-        content: true,
-        newsCategory: {
-          content: true,
-        },
-      },
-      order,
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    })
-
-    const newsList = list.filter((news) => news.content.some((content) => content.language === lang))
-
-    newsList.forEach(({ content }) => content.sort((item) => (item.language === lang ? -1 : 1)))
+    const [newsList, total] = await listQuery.getManyAndCount()
 
     return {
-      meta: { total: await this.newsRepository.count({ where }) },
-      data: newsList.map((news) => this.newsDataMapper.newsToSearchResult(news)),
+      meta: { total },
+      data: newsList.map((news) => this.newsDataMapper.newsToSearchResult(news, { language: lang })),
     }
   }
 
@@ -109,7 +85,6 @@ export class NewsService {
     const foundItem = await this.newsRepository.findOne({
       where: {
         id,
-        published: true,
       },
       relations: {
         content: true,
@@ -125,10 +100,81 @@ export class NewsService {
     }
   }
 
+  async createItem(newsCreateDto: NewsCreateDto): Promise<{ data: NewsToItemById }> {
+    const foundItem = await this.findItemBySlug(newsCreateDto.slug)
+
+    if (foundItem) {
+      throw new BadRequestException('News with this slug already exists')
+    }
+
+    const newsEntity = new NewsEntity({
+      slug: newsCreateDto.slug,
+      content: newsCreateDto.translationList.map((translation) => ({
+        ...translation,
+        language: translation.lang,
+      })),
+    })
+
+    const item = await this.newsRepository.save(newsEntity)
+
+    return { data: this.newsDataMapper.newsGetById(item) }
+  }
+
+  async updateItemById(id: string, newsUpdateDto: NewsUpdateDto): Promise<{ data: NewsToItemById }> {
+    const foundItem = await this.newsRepository.findOne({
+      where: {
+        id,
+      },
+    })
+
+    if (!foundItem) {
+      throw new NotFoundException()
+    }
+
+    const { slug, translationList, publishedAt, createdAt, isPublished, newsCategory } = newsUpdateDto
+
+    const existingItem = await this.findItemBySlug(slug)
+
+    if (existingItem && existingItem.id !== id) {
+      throw new BadRequestException(`News with slug ${slug} already exists`)
+    }
+
+    const content = translationList.map((translation) => ({
+      id: translation.translationId,
+      title: translation.title,
+      description: translation.description,
+      content: translation.contentData.htmlText,
+      language: translation.lang,
+      metadata: translation.metaData,
+      thumbnailUrl: translation.thumbnailUrl,
+    }))
+
+    Object.assign(foundItem, {
+      slug,
+      publishedAt,
+      createdAt,
+      published: isPublished,
+      content,
+      newsCategory: newsCategory ? { id: newsCategory.id } : null,
+    })
+
+    await this.newsRepository.save(foundItem)
+
+    return await this.getItemById(id)
+  }
+
   async deleteItemById(id: string): Promise<void> {
     await this.getItemById(id)
     await this.newsRepository.delete({
       id,
+    })
+  }
+
+  async findItemBySlug(slug: string): Promise<NewsEntity> {
+    return await this.newsRepository.findOne({
+      where: {
+        slug,
+      },
     })
   }
 }

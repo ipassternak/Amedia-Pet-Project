@@ -1,9 +1,8 @@
-import { Transform } from 'class-transformer'
 import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator'
 
 import { NewsSortedFields } from 'src/modules/main/interfaces/news'
 
-import { QueryDto } from 'src/modules/main/dto/abstract/query.dto'
+import { EmptyToUndefined, QueryDto } from 'src/modules/main/dto/abstract/query.dto'
 
 export class NewsQueryDto extends QueryDto<NewsSortedFields> {
   @IsString()
@@ -11,11 +10,12 @@ export class NewsQueryDto extends QueryDto<NewsSortedFields> {
 
   @IsOptional()
   @IsString()
+  @EmptyToUndefined()
   newsCategory?: string
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => (value ? value.trim() : undefined))
+  @EmptyToUndefined()
   searchTerm?: string
 
   @IsOptional()
@@ -28,6 +28,6 @@ export class NewsQueryDto extends QueryDto<NewsSortedFields> {
 
   @IsOptional()
   @IsEnum(NewsSortedFields)
-  @Transform(({ value }) => (value ? value.trim() : undefined))
+  @EmptyToUndefined()
   sortColumn?: NewsSortedFields
 }

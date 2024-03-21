@@ -9,12 +9,16 @@ import {
 import { NewsCategoryContentEntity } from 'src/modules/main/entities/news-category-content.entity'
 import { NewsCategoryEntity } from 'src/modules/main/entities/news-category.entity'
 
+interface Options {
+  language: string
+}
+
 @Injectable()
 export class NewsCategoryDataMapper {
-  private newsCategoryContentToTitle(content: NewsCategoryContentEntity[]): string {
-    const [{ title }] = content
+  private newsCategoryContentToTitle(content: NewsCategoryContentEntity[], opts?: Options): string {
+    const contentItem = (opts && content.find((c) => c.language === opts.language)) ?? content[0]
 
-    return title
+    return contentItem?.title ?? ''
   }
 
   private newsCategoryContentToTranslation(content: NewsCategoryContentEntity): NewsCategoryContentToTranslation {
@@ -27,12 +31,12 @@ export class NewsCategoryDataMapper {
     }
   }
 
-  newsCategoryToSearchResult(entity: NewsCategoryEntity): NewsCategoryToListItem {
+  newsCategoryToSearchResult(entity: NewsCategoryEntity, opts?: Options): NewsCategoryToListItem {
     const { id, publishedAt, createdAt, content, published } = entity
 
     return {
       id,
-      title: this.newsCategoryContentToTitle(content),
+      title: this.newsCategoryContentToTitle(content, opts),
       publishedAt,
       createdAt,
       isPublished: published,

@@ -6,6 +6,13 @@ export enum SortedDirection {
   DESC = 'DESC',
 }
 
+export const EmptyToUndefined = (): PropertyDecorator =>
+  Transform(({ value }: { value?: string }): string | undefined => {
+    const res = value?.trim()
+
+    return res ? res : undefined
+  })
+
 export abstract class QueryDto<T> {
   @IsNumber()
   @Transform(({ value }) => parseInt(value, 10))
