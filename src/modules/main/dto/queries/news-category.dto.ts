@@ -1,12 +1,13 @@
 import { IsEnum, IsOptional } from 'class-validator'
 
-import { NewsCategorySortedFields } from 'src/modules/main/interfaces/news-category'
+import { QueryDto } from 'src/core/abstracts/query.dto'
+import { EmptyToUndefined } from 'src/core/inc/decorators'
 
-import { EmptyToUndefined, QueryDto } from 'src/modules/main/dto/abstract/query.dto'
+import { NewsCategorySortFields } from 'src/modules/main/interfaces/news-category'
 
-export class NewsCategoryQueryDto extends QueryDto<NewsCategorySortedFields> {
+export class NewsCategoryQueryDto extends QueryDto<NewsCategorySortFields> {
   @IsOptional()
-  @IsEnum(NewsCategorySortedFields)
   @EmptyToUndefined()
-  sortColumn?: NewsCategorySortedFields
+  @IsEnum(NewsCategorySortFields)
+  sortColumn?: NewsCategorySortFields
 }

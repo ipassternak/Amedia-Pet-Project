@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer'
 import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString, MaxLength, ValidateNested } from 'class-validator'
 
-import { TranslationDto } from 'src/modules/main/dto/requests/translations.dto'
+import { TranslationDto } from 'src/modules/main/dto/helpers/translations.dto'
 
 export class NewsCreateDto {
   @IsString()

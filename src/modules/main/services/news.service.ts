@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { NewsSortedFields, NewsToItemById, NewsToListItem } from 'src/modules/main/interfaces/news'
+import { NewsSortFields, NewsToItemById, NewsToListItem } from 'src/modules/main/interfaces/news'
 
 import { NewsQueryDto } from 'src/modules/main/dto/queries/news.dto'
 import { NewsCreateDto } from 'src/modules/main/dto/requests/news-create.dto'
@@ -65,12 +65,12 @@ export class NewsService {
       listQuery.andWhere('news.publishedAt >= :publishedAfter', { publishedAfter })
     }
 
-    if (sortColumn === NewsSortedFields.TITLE) {
+    if (sortColumn === NewsSortFields.TITLE) {
       listQuery.orderBy('newsContent.title', sortDirection)
-    } else if (sortColumn === NewsSortedFields.NEWS_CATEGORY) {
+    } else if (sortColumn === NewsSortFields.NEWS_CATEGORY) {
       listQuery.orderBy('newsCategoryContent.title', sortDirection)
     } else if (sortColumn) {
-      listQuery.orderBy(sortColumn, sortDirection)
+      listQuery.orderBy(`news.${sortColumn}`, sortDirection)
     }
 
     const [newsList, total] = await listQuery.getManyAndCount()

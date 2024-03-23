@@ -1,4 +1,4 @@
-import { Transform, Type } from 'class-transformer'
+import { Type } from 'class-transformer'
 import {
   IsArray,
   IsBoolean,
@@ -13,10 +13,13 @@ import {
   ValidateNested,
 } from 'class-validator'
 
-import { ContentDataDto } from 'src/modules/main/dto/requests/content-data.dto'
-import { MetaDataDto } from 'src/modules/main/dto/requests/metadata.dto'
+import { GenericDto } from 'src/core/abstracts/generic.dto'
+import { ToDate } from 'src/core/inc/decorators'
 
-export class TranslationDto {
+import { ContentDataDto } from 'src/modules/main/dto/helpers/content-data.dto'
+import { MetaDataDto } from 'src/modules/main/dto/helpers/metadata.dto'
+
+export class TranslationDto extends GenericDto {
   @IsString()
   @MaxLength(5)
   @IsNotEmpty()
@@ -35,10 +38,10 @@ export class TranslationDto {
   @IsOptional()
   @MaxLength(255)
   @IsString()
-  thumbnailUrl: string
+  thumbnailUrl?: string
 }
 
-export class TranslationWithoutDescriptionDto {
+export class TranslationWithoutDescriptionDto extends GenericDto {
   @IsString()
   @MaxLength(5)
   @IsNotEmpty()
@@ -52,7 +55,7 @@ export class TranslationWithoutDescriptionDto {
   @IsOptional()
   @MaxLength(255)
   @IsString()
-  thumbnailUrl: string
+  thumbnailUrl?: string
 }
 
 export class NewsTranslationDto extends TranslationDto {
@@ -61,20 +64,22 @@ export class NewsTranslationDto extends TranslationDto {
 }
 
 export class NewsTranslationWithMetadataDto extends NewsTranslationDto {
+  @IsOptional()
   @IsObject()
   @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => ContentDataDto)
-  contentData: ContentDataDto
+  contentData?: ContentDataDto
 
+  @IsOptional()
   @IsObject()
   @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => MetaDataDto)
-  metaData: MetaDataDto
+  metaData?: MetaDataDto
 }
 
-export class NewsCategoryTranslationDto {
+export class NewsCategoryTranslationDto extends GenericDto {
   @IsUUID()
   translationId: string
 
@@ -89,7 +94,7 @@ export class NewsCategoryTranslationDto {
   title: string
 }
 
-export class NewsCategoryUpdateDto {
+export class NewsCategoryUpdateDto extends GenericDto {
   @IsUUID()
   id: string
 
@@ -99,12 +104,12 @@ export class NewsCategoryUpdateDto {
   @Type(() => NewsCategoryTranslationDto)
   translationList: NewsCategoryTranslationDto[]
 
+  @ToDate()
   @IsDate()
-  @Transform(({ value }) => new Date(value))
   publishedAt: Date
 
+  @ToDate()
   @IsDate()
-  @Transform(({ value }) => new Date(value))
   createdAt: Date
 
   @IsBoolean()

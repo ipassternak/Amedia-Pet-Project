@@ -1,6 +1,6 @@
 import { NewsCategoryToItemById, NewsCategoryToListItem } from 'src/modules/main/interfaces/news-category'
 
-export enum NewsSortedFields {
+export enum NewsSortFields {
   ID = 'id',
   TITLE = 'title',
   NEWS_CATEGORY = 'newsCategory',

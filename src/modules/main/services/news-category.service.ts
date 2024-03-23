@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import {
-  NewsCategorySortedFields,
+  NewsCategorySortFields,
   NewsCategoryToItemById,
   NewsCategoryToListItem,
 } from 'src/modules/main/interfaces/news-category'
@@ -48,10 +48,10 @@ export class NewsCategoryService {
       .skip((page - 1) * pageSize)
       .take(pageSize)
 
-    if (sortColumn === NewsCategorySortedFields.TITLE) {
+    if (sortColumn === NewsCategorySortFields.TITLE) {
       listQuery.orderBy('newsCategoryContent.title', sortDirection)
     } else if (sortColumn) {
-      listQuery.orderBy(sortColumn, sortDirection)
+      listQuery.orderBy(`newsCategory.${sortColumn}`, sortDirection)
     }
 
     const [newsCategoryList, total] = await listQuery.getManyAndCount()

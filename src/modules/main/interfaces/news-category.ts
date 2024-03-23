@@ -1,4 +1,4 @@
-export enum NewsCategorySortedFields {
+export enum NewsCategorySortFields {
   ID = 'id',
   TITLE = 'title',
   PUBLISHED_AT = 'publishedAt',

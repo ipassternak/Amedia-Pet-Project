@@ -1,21 +1,22 @@
 import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator'
 
-import { NewsSortedFields } from 'src/modules/main/interfaces/news'
+import { QueryDto } from 'src/core/abstracts/query.dto'
+import { EmptyToUndefined } from 'src/core/inc/decorators'
 
-import { EmptyToUndefined, QueryDto } from 'src/modules/main/dto/abstract/query.dto'
+import { NewsSortFields } from 'src/modules/main/interfaces/news'
 
-export class NewsQueryDto extends QueryDto<NewsSortedFields> {
+export class NewsQueryDto extends QueryDto<NewsSortFields> {
   @IsString()
   lang: string
 
   @IsOptional()
-  @IsString()
   @EmptyToUndefined()
+  @IsString()
   newsCategory?: string
 
   @IsOptional()
-  @IsString()
   @EmptyToUndefined()
+  @IsString()
   searchTerm?: string
 
   @IsOptional()
@@ -27,7 +28,7 @@ export class NewsQueryDto extends QueryDto<NewsSortedFields> {
   publishedAfter?: string
 
   @IsOptional()
-  @IsEnum(NewsSortedFields)
   @EmptyToUndefined()
-  sortColumn?: NewsSortedFields
+  @IsEnum(NewsSortFields)
+  sortColumn?: NewsSortFields
 }

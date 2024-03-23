@@ -1,4 +1,4 @@
-import { Transform, Type } from 'class-transformer'
+import { Type } from 'class-transformer'
 import {
   ArrayNotEmpty,
   IsArray,
@@ -13,8 +13,10 @@ import {
   ValidateNested,
 } from 'class-validator'
 
+import { ToDate } from 'src/core/inc/decorators'
+
+import { NewsTranslationWithMetadataDto } from 'src/modules/main/dto/helpers/translations.dto'
 import { NewsCategoryUpdateDto } from 'src/modules/main/dto/requests/news-category-update.dto'
-import { NewsTranslationWithMetadataDto } from 'src/modules/main/dto/requests/translations.dto'
 
 export class NewsUpdateDto {
   @IsString()
@@ -35,12 +37,12 @@ export class NewsUpdateDto {
   @Type(() => NewsCategoryUpdateDto)
   newsCategory?: NewsCategoryUpdateDto
 
+  @ToDate()
   @IsDate()
-  @Transform(({ value }) => new Date(value))
   publishedAt: Date
 
+  @ToDate()
   @IsDate()
-  @Transform(({ value }) => new Date(value))
   createdAt: Date
 
   @IsBoolean()

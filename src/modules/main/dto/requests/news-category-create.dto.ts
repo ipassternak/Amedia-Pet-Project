@@ -1,9 +1,11 @@
 import { Type } from 'class-transformer'
 import { ArrayNotEmpty, IsArray, ValidateNested } from 'class-validator'
 
-import { TranslationWithoutDescriptionDto } from 'src/modules/main/dto/requests/translations.dto'
+import { GenericDto } from 'src/core/abstracts/generic.dto'
 
-export class NewsCategoryCreateDto {
+import { TranslationWithoutDescriptionDto } from 'src/modules/main/dto/helpers/translations.dto'
+
+export class NewsCategoryCreateDto extends GenericDto {
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
