@@ -5,7 +5,7 @@ import { NewsContentToTranslation, NewsToItemById, NewsToListItem } from 'src/mo
 import { NewsContentEntity } from 'src/modules/main/entities/news-content.entity'
 import { NewsEntity } from 'src/modules/main/entities/news.entity'
 
-import { NewsCategoryDataMapper } from 'src/modules/main/data-mappers/news-category.data-mappers'
+import { NewsCategoryDataMapper } from 'src/modules/main/data-mappers/news-category.data-mapper'
 
 interface Options {
   language: string

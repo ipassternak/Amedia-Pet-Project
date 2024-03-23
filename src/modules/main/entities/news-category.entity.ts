@@ -1,10 +1,12 @@
-import { Column, CreateDateColumn, DeepPartial, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+
+import { GenericEntity } from 'src/core/abstracts/generic.entity'
 
 import { NewsCategoryContentEntity } from 'src/modules/main/entities/news-category-content.entity'
 import { NewsEntity } from 'src/modules/main/entities/news.entity'
 
 @Entity('category')
-export class NewsCategoryEntity {
+export class NewsCategoryEntity extends GenericEntity<NewsCategoryEntity> {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
@@ -24,8 +26,4 @@ export class NewsCategoryEntity {
     cascade: true,
   })
   content: NewsCategoryContentEntity[]
-
-  constructor(partial: DeepPartial<NewsCategoryEntity>) {
-    Object.assign(this, partial)
-  }
 }

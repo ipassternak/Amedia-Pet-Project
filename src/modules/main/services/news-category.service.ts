@@ -14,7 +14,7 @@ import { NewsCategoryUpdateDto } from 'src/modules/main/dto/requests/news-catego
 
 import { NewsCategoryEntity } from 'src/modules/main/entities/news-category.entity'
 
-import { NewsCategoryDataMapper } from 'src/modules/main/data-mappers/news-category.data-mappers'
+import { NewsCategoryDataMapper } from 'src/modules/main/data-mappers/news-category.data-mapper'
 
 @Injectable()
 export class NewsCategoryService {
