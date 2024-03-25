@@ -73,7 +73,6 @@ export class NewsTranslationWithMetadataDto extends NewsTranslationDto {
 
   @IsOptional()
   @IsObject()
-  @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => MetaDataDto)
   metaData?: MetaDataDto
